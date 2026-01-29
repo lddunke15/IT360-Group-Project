@@ -1,5 +1,5 @@
 # IT-360-Group-Project
-type description here
+Digital Forensics tool to help administrators create login logs to analyze to help prevent intrusions from attackers.
 
 ## Team Members
 - Laney Dunker
@@ -7,4 +7,4 @@ type description here
 - Jonah Morgan
 
 ## Full Project Idea
-some new text here.
+We will be creating a tool that will detect and list the number of failed login attempts and the correlating IP addresses for the failed attempts for an application. The number of failed attempts, IP addresses, and failed passwords will be stored into a log for administration analysis. This tool will have a feature that will lock a user out after a set number of failed attempts until an administrator allows them to reattempt login.
