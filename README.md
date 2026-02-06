@@ -19,5 +19,8 @@ Kail Linux (Testing Simulation)
 
 
 ## Timeline
-
+- Week 1-3: Build the bones of the application we will be working in, begin storage mechanism for attempts and other information for the logs
+- Week 4-6: Write the code for tracking attempts and working on the logic for system
+- Week 7-9: Implement AI (We are not yet exactly sure how we will be doing this)
+- Week 10-12: Finish up the project and report
 
