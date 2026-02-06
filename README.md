@@ -3,7 +3,7 @@ Digital Forensics tool to help administrators create login logs to analyze to he
 
 ## Team Members
 - Laney Dunker
-- Danniella Agyeman
+- Daniella Agyeman
 - Jonah Morgan
 
 ## Full Project Idea
