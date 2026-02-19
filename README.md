@@ -22,12 +22,12 @@ We will be creating a tool that will detect and list the number of failed login 
 - Machine Learning Libraries (scikit-learn, pandas)  
   Used to analyze failed login attempt data and assist in identifying anomalous or high-risk login behavior.
 
-  ## Potential Idea for AI Integration
-  - Using AI to track patterns and find which ones are concerning
-  - - How many attempts from certain IP addresses
-    - Time between attempts
-    - How close the password attempted actually was to the correct one
-    - etc
+## Potential Idea for AI Integration
+- Using AI to track patterns and find which ones are concerning
+  - How many attempts from certain IP addresses
+  - Time between attempts
+  - How close the password attempted actually was to the correct one
+  - Generate message for admin
 
 ## Timeline
 - Week 1-3: Build the bones of the application we will be working in, begin storage mechanism for attempts and other information for the logs
