@@ -10,7 +10,10 @@ LOG_FILE = "login_logs.json"
 #In Memory Database
 users = {
     "admin": hashlib.sha256("password123".encode()).hexdigest(),
-    "user1": hashlib.sha256("securepass".encode()).hexdigest()
+    "user1": hashlib.sha256("securepass".encode()).hexdigest(),
+    "Laney": hashlib.sha256("pink".encode()).hexdigest(),
+    "Daniela": hashlib.sha256("green".encode()).hexdigest(),
+    "Jonah": hashlib.sha256("purple".encode()).hexdigest()
 }
 
 failed_attempts = {}   # {username: [timestamps]}
