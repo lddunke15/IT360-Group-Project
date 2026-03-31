@@ -38,6 +38,7 @@ We will be creating a tool that will detect and list the number of failed login 
 ## Update
  - There is a script that runs a login type bones. That login script needs:
  - - Admin Strength
+   - Admin needs rewritten so that there are user credentials
    - attempt to track IP not type it in OR Store the IP of the user within the user profile
    - AI Integration
    - Log tools?
