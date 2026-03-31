@@ -1,8 +1,8 @@
 import sqlite3
 import os
 
-DB_NAME = "phishing.db"
-REPORT_FILE = "phishing_report.txt"
+DB_NAME = "login.db"
+REPORT_FILE = "Logs.txt"
 
 def load_data():
 	"""Load event data from the SQLite database safely."""
@@ -91,7 +91,7 @@ def write_report(clicks, submissions, score, severity, explanation, mitigations,
 		for r in rows:
 			f.write(str(r) + "\n")
 
-	print("AI-based phishing_report.txt generated successfully!")
+	print("AI-based Logs.txt generated successfully!")
 
 def run():
 	clicks, submissions, rows = load_data()
