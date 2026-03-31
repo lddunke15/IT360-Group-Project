@@ -35,3 +35,9 @@ We will be creating a tool that will detect and list the number of failed login 
 - Week 7-9: Implement AI (We are not yet exactly sure how we will be doing this)
 - Week 10-12: Finish up the project and report
 
+## Update
+ - There is a script that runs a login type bones. That login script needs:
+ - - Admin Strength
+   - attempt to track IP not type it in OR Store the IP of the user within the user profile
+   - AI Integration
+   - Log tools?
