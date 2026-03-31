@@ -6,7 +6,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-DB_NAME = "phishing.db"
+DB_NAME = "login.db"
 
 def init_db():
 
