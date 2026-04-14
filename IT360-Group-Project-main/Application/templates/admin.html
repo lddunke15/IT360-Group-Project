@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #0f172a;
+            --muted: #475569;
+            --accent: #0284c7;
+            --danger: #dc2626;
+            --border: #cbd5e1;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: linear-gradient(180deg, #e2e8f0 0%, var(--bg) 50%);
+            color: var(--text);
+        }
+
+        .layout {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 20px 40px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .row {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        h1, h2, h3 { margin-top: 0; }
+        p { color: var(--muted); }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #e0f2fe;
+            color: #0c4a6e;
+        }
+
+        form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        select, button {
+            padding: 11px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-size: 0.98rem;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .danger {
+            background: var(--danger);
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 800px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="layout">
+        <div class="panel">
+            <h1>Admin Dashboard</h1>
+            <p>Review locked accounts, generate reports, and inspect suspicious IP behavior.</p>
+            {% if message %}
+                <div class="message">{{ message }}</div>
+            {% endif %}
+            <a href="{{ url_for('landing') }}">Back to login page</a>
+        </div>
+
+        <div class="row">
+            <section class="panel">
+                <h2>Locked Accounts</h2>
+                {% if lockouts %}
+                    {% for username, details in lockouts.items() %}
+                        <div class="card">
+                            <strong>{{ username }}</strong><br>
+                            Locked at: {{ details.locked_at }}<br>
+                            Reason: {{ details.reason }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No users are currently locked.</p>
+                {% endif %}
+
+                <h3>Unlock User</h3>
+                <form action="{{ url_for('unlock_user') }}" method="post">
+                    <select name="username">
+                        {% for user in users %}
+                            <option value="{{ user }}">{{ user }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="danger" type="submit">Unlock Account</button>
+                </form>
+            </section>
+
+            <section class="panel">
+                <h2>Report Actions</h2>
+                <p>Generate the text report file used for administration analysis.</p>
+                <form action="{{ url_for('generate_report') }}" method="post">
+                    <button type="submit">Generate Logs.txt</button>
+                </form>
+
+                <h3 style="margin-top: 22px;">Current Totals</h3>
+                <div class="card">Total events: {{ analysis.totals.total_events }}</div>
+                <div class="card">Failed attempts: {{ analysis.totals.failed_attempts }}</div>
+                <div class="card">Locked attempts: {{ analysis.totals.locked_attempts }}</div>
+                <div class="card">Successful logins: {{ analysis.totals.successful_logins }}</div>
+            </section>
+        </div>
+
+        <section class="panel">
+            <h2>Suspicious IP Analysis</h2>
+            {% if analysis.alerts %}
+                {% for alert in analysis.alerts %}
+                    <div class="card">
+                        <strong>{{ alert.severity }}</strong> - <code>{{ alert.ip }}</code><br>
+                        Attempts: {{ alert.attempt_count }}<br>
+                        Targets: {{ ", ".join(alert.usernames) }}<br>
+                        Fastest retry gap: {{ alert.minimum_seconds_between_attempts }} seconds<br>
+                        Closest password similarity: {{ alert.closest_password_similarity }}%<br>
+                        Admin message: {{ alert.admin_message }}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No suspicious IPs have been identified yet.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

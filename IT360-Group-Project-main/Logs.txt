@@ -1,0 +1,55 @@
+Failed Login Monitoring Report
+================================
+
+Total Events: 18
+Failed Attempts: 11
+Locked Attempts: 1
+Successful Logins: 3
+Unknown User Attempts: 1
+
+Suspicious IP Analysis
+----------------------
+IP Address: 192.168.1.50
+Severity: CRITICAL (score 85)
+Attempts: 6
+Users Targeted: user1
+Average Seconds Between Attempts: 0.04
+Closest Password Similarity: 40.0%
+Admin Message: [CRITICAL] IP 192.168.1.50 generated 6 failed attempts against user1; average gap 0.04 seconds; closest attempted password matched 40.0% of the real password pattern. Recommended action: review the source IP, keep impacted accounts locked if needed, and reset credentials when similarity is unusually high. Risk score: 85.
+
+IP Address: 127.0.0.1
+Severity: CRITICAL (score 105)
+Attempts: 6
+Users Targeted: Jonah, lddunke
+Average Seconds Between Attempts: 137.74
+Closest Password Similarity: 16.67%
+Admin Message: [CRITICAL] IP 127.0.0.1 generated 6 failed attempts against Jonah, lddunke; average gap 137.74 seconds; closest attempted password matched 16.67% of the real password pattern. Recommended action: review the source IP, keep impacted accounts locked if needed, and reset credentials when similarity is unusually high. Risk score: 105.
+
+IP Address: 10.0.0.31
+Severity: LOW (score 22)
+Attempts: 1
+Users Targeted: Laney
+Average Seconds Between Attempts: None
+Closest Password Similarity: 75.0%
+Admin Message: [LOW] IP 10.0.0.31 generated 1 failed attempts against Laney; single attempt observed; closest attempted password matched 75.0% of the real password pattern. Recommended action: review the source IP, keep impacted accounts locked if needed, and reset credentials when similarity is unusually high. Risk score: 22.
+
+Detailed Log Entries
+--------------------
+{"timestamp": "2026-04-14T22:58:47.045376", "username": "user1", "ip": "192.168.1.50", "status": "failed", "failed_attempt_number": 1, "attempted_password_preview": "wr*******", "attempted_password_hash": "17b2ba89601ba249fab3e1ce328756ee97fefdaaa4459db5c010953302fa4d28", "password_similarity_percent": 40.0, "locked": false}
+{"timestamp": "2026-04-14T22:58:47.064906", "username": "user1", "ip": "192.168.1.50", "status": "failed", "failed_attempt_number": 2, "attempted_password_preview": "wr*******", "attempted_password_hash": "17b2ba89601ba249fab3e1ce328756ee97fefdaaa4459db5c010953302fa4d28", "password_similarity_percent": 40.0, "locked": false}
+{"timestamp": "2026-04-14T22:58:47.103993", "username": "user1", "ip": "192.168.1.50", "status": "failed", "failed_attempt_number": 3, "attempted_password_preview": "wr*******", "attempted_password_hash": "17b2ba89601ba249fab3e1ce328756ee97fefdaaa4459db5c010953302fa4d28", "password_similarity_percent": 40.0, "locked": false}
+{"timestamp": "2026-04-14T22:58:47.144497", "username": "user1", "ip": "192.168.1.50", "status": "failed", "failed_attempt_number": 4, "attempted_password_preview": "wr*******", "attempted_password_hash": "17b2ba89601ba249fab3e1ce328756ee97fefdaaa4459db5c010953302fa4d28", "password_similarity_percent": 40.0, "locked": false}
+{"timestamp": "2026-04-14T22:58:47.188805", "username": "user1", "ip": "192.168.1.50", "status": "failed", "failed_attempt_number": 5, "attempted_password_preview": "wr*******", "attempted_password_hash": "17b2ba89601ba249fab3e1ce328756ee97fefdaaa4459db5c010953302fa4d28", "password_similarity_percent": 40.0, "locked": true}
+{"timestamp": "2026-04-14T22:58:47.228742", "username": "user1", "ip": "192.168.1.50", "status": "locked", "failed_attempt_number": 0, "attempted_password_preview": "se********", "attempted_password_hash": "fbb4a8a163ffa958b4f02bf9cabb30cfefb40de803f2c4c346a9d39b3be1b544", "password_similarity_percent": 0.0, "locked": true}
+{"timestamp": "2026-04-14T22:58:47.250648", "username": "user1", "ip": "10.0.0.21", "status": "admin_unlock", "failed_attempt_number": 0, "attempted_password_preview": "", "attempted_password_hash": "", "password_similarity_percent": 0, "locked": false}
+{"timestamp": "2026-04-14T22:58:47.298056", "username": "user1", "ip": "192.168.1.50", "status": "success", "failed_attempt_number": 0, "attempted_password_preview": "se********", "attempted_password_hash": "fbb4a8a163ffa958b4f02bf9cabb30cfefb40de803f2c4c346a9d39b3be1b544", "password_similarity_percent": 100.0, "locked": false}
+{"timestamp": "2026-04-14T23:07:08.541770", "username": "lddunke", "ip": "127.0.0.1", "status": "unknown_user", "failed_attempt_number": 0, "attempted_password_preview": "pi**", "attempted_password_hash": "a67a41c8bc79d5da917b5051f1f0d3f5aeb4b63ba246b3546a961ef7a3c7d931", "password_similarity_percent": 0.0, "locked": false}
+{"timestamp": "2026-04-14T23:08:12.963820", "username": "Laney", "ip": "10.0.0.31", "status": "failed", "failed_attempt_number": 1, "attempted_password_preview": "Pi**", "attempted_password_hash": "bd38ed7732402b1a93261916c5906016cdccd1a9600b3864208246f6a3299bd0", "password_similarity_percent": 75.0, "locked": false}
+{"timestamp": "2026-04-14T23:08:20.349180", "username": "Laney", "ip": "10.0.0.31", "status": "success", "failed_attempt_number": 0, "attempted_password_preview": "", "attempted_password_hash": "", "password_similarity_percent": 0.0, "locked": false}
+{"timestamp": "2026-04-14T23:17:21.607081", "username": "Laney", "ip": "127.0.0.1", "status": "success", "failed_attempt_number": 0, "attempted_password_preview": "", "attempted_password_hash": "", "password_similarity_percent": 0.0, "locked": false}
+{"timestamp": "2026-04-14T23:18:18.722706", "username": "Jonah", "ip": "127.0.0.1", "status": "failed", "failed_attempt_number": 1, "attempted_password_preview": "gr***", "attempted_password_hash": "ba4788b226aa8dc2e6dc74248bb9f618cfa8c959e0c26c147be48f6839a0b088", "password_similarity_percent": 16.67, "locked": false}
+{"timestamp": "2026-04-14T23:18:27.813605", "username": "Jonah", "ip": "127.0.0.1", "status": "failed", "failed_attempt_number": 2, "attempted_password_preview": "gr***", "attempted_password_hash": "ba4788b226aa8dc2e6dc74248bb9f618cfa8c959e0c26c147be48f6839a0b088", "password_similarity_percent": 16.67, "locked": false}
+{"timestamp": "2026-04-14T23:18:30.831578", "username": "Jonah", "ip": "127.0.0.1", "status": "failed", "failed_attempt_number": 3, "attempted_password_preview": "fd**", "attempted_password_hash": "6b8dca09e851a987050463c9c60603e9ad797ba09117056fc2e0c07bcac66e43", "password_similarity_percent": 0.0, "locked": false}
+{"timestamp": "2026-04-14T23:18:34.210554", "username": "Jonah", "ip": "127.0.0.1", "status": "failed", "failed_attempt_number": 4, "attempted_password_preview": "fd**", "attempted_password_hash": "6b8dca09e851a987050463c9c60603e9ad797ba09117056fc2e0c07bcac66e43", "password_similarity_percent": 0.0, "locked": false}
+{"timestamp": "2026-04-14T23:18:37.261164", "username": "Jonah", "ip": "127.0.0.1", "status": "failed", "failed_attempt_number": 5, "attempted_password_preview": "fd**", "attempted_password_hash": "6b8dca09e851a987050463c9c60603e9ad797ba09117056fc2e0c07bcac66e43", "password_similarity_percent": 0.0, "locked": true}
+{"timestamp": "2026-04-14T23:18:44.385950", "username": "Jonah", "ip": "10.0.0.33", "status": "admin_unlock", "failed_attempt_number": 0, "attempted_password_preview": "", "attempted_password_hash": "", "password_similarity_percent": 0, "locked": false}

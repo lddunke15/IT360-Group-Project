@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Failed Login Monitor</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #111827;
+            --panel-soft: #1f2937;
+            --text: #e5eefb;
+            --muted: #9fb0c8;
+            --accent: #38bdf8;
+            --danger: #f97316;
+            --success: #22c55e;
+            --border: #334155;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 55%);
+            color: var(--text);
+        }
+
+        .layout {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+        }
+
+        .hero, .panel {
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .hero { margin-bottom: 24px; }
+
+        .grid {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: minmax(280px, 360px) 1fr;
+        }
+
+        h1, h2, h3 { margin-top: 0; }
+        p { color: var(--muted); line-height: 1.5; }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        input, select, button {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 12px 14px;
+            font-size: 1rem;
+        }
+
+        input, select {
+            margin-bottom: 14px;
+            background: #0b1220;
+            color: var(--text);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--accent), #2563eb);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        .message.error {
+            background: rgba(249, 115, 22, 0.12);
+            border-color: rgba(249, 115, 22, 0.4);
+        }
+
+        .stats {
+            display: grid;
+            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: var(--panel-soft);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.6rem;
+            margin-top: 6px;
+        }
+
+        .alert {
+            border-left: 4px solid var(--danger);
+            background: rgba(249, 115, 22, 0.1);
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .links {
+            margin-top: 16px;
+        }
+
+        .links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        code {
+            background: #0b1220;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="layout">
+        <section class="hero">
+            <h1>Failed Login Monitoring Tool</h1>
+            <p>
+                This web server records the visitor IP automatically during login attempts, applies account lockouts
+                after {{ max_attempts }} failed tries, and surfaces suspicious patterns for admins.
+            </p>
+        </section>
+
+        <section class="grid">
+            <div class="panel">
+                <h2>User Login</h2>
+                <p>Use one of the demo users below or type another username to simulate an unknown account attempt.</p>
+
+                {% if message %}
+                    <div class="message {% if not success %}error{% endif %}">{{ message }}</div>
+                {% endif %}
+
+                <form action="{{ url_for('login') }}" method="post">
+                    <label for="username">Username</label>
+                    <input id="username" name="username" list="users" placeholder="user1" required>
+                    <datalist id="users">
+                        {% for user in users %}
+                            <option value="{{ user }}"></option>
+                        {% endfor %}
+                    </datalist>
+
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" placeholder="Enter password" required>
+
+                    <button type="submit">Attempt Login</button>
+                </form>
+
+                <div class="links">
+                    <a href="{{ url_for('admin_dashboard') }}">Open admin dashboard</a>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Live Monitoring Snapshot</h2>
+                <div class="stats">
+                    <div class="stat">
+                        Total Events
+                        <strong>{{ analysis.totals.total_events }}</strong>
+                    </div>
+                    <div class="stat">
+                        Failed Attempts
+                        <strong>{{ analysis.totals.failed_attempts }}</strong>
+                    </div>
+                    <div class="stat">
+                        Locked Attempts
+                        <strong>{{ analysis.totals.locked_attempts }}</strong>
+                    </div>
+                    <div class="stat">
+                        Unknown Users
+                        <strong>{{ analysis.totals.unknown_user_attempts }}</strong>
+                    </div>
+                </div>
+
+                <h3>Suspicious IP Alerts</h3>
+                {% if analysis.alerts %}
+                    {% for alert in analysis.alerts[:5] %}
+                        <div class="alert">
+                            <strong>{{ alert.severity }}</strong> from <code>{{ alert.ip }}</code><br>
+                            {{ alert.admin_message }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No suspicious IP activity has been logged yet.</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
