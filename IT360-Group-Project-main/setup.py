@@ -1,3 +1,4 @@
+# Import key functions, constants, and data from your security_tool module
 from Application.security_tool import (
     MAX_ATTEMPTS,
     USERS,
@@ -6,7 +7,7 @@ from Application.security_tool import (
     write_report,
 )
 
-
+# Module for providing options, handling the login attempt, allowing the admin to lock the account and other executive functions of the module. 
 def main():
     while True:
         print("\nFailed Login Monitoring Tool")
