@@ -4,18 +4,19 @@ import os
 from collections import defaultdict
 from datetime import datetime
 
-
+# File paths and settings 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_FILE = os.path.join(BASE_DIR, "login_logs.json")
 STATE_FILE = os.path.join(BASE_DIR, "auth_state.json")
 REPORT_FILE = os.path.join(BASE_DIR, "Logs.txt")
-MAX_ATTEMPTS = 5
+MAX_ATTEMPTS = 5 # Max login attempts before lockout 
 
 
 def hash_password(password):
+    # HAsh password using SHA-256
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
-
+#Demo users with hashed paswords and registered IPs
 USERS = {
     "admin": {
         "password_hash": hash_password("password123"),
@@ -46,10 +47,12 @@ USERS = {
 
 
 def now_iso():
+    # Get current UTC time
     return datetime.utcnow().isoformat()
 
 
 def load_json_file(path, default):
+    #Load JSON file safely 
     if not os.path.exists(path):
         return default
 
@@ -61,36 +64,42 @@ def load_json_file(path, default):
 
 
 def save_json_file(path, payload):
+    #Save data to JSON file 
     with open(path, "w", encoding="utf-8") as file:
         json.dump(payload, file, indent=4)
 
 
 def load_logs():
+    # Load all login logs 
     return load_json_file(LOG_FILE, [])
 
 
 def append_log(entry):
+    # Add new log entry 
     logs = load_logs()
     logs.append(entry)
     save_json_file(LOG_FILE, logs)
 
 
 def load_state():
+    # Load login state (failed attemps + lockouts) 
     default = {"failed_attempts": {}, "lockouts": {}}
     return load_json_file(STATE_FILE, default)
 
 
 def save_state(state):
+    # Save login state
     save_json_file(STATE_FILE, state)
 
 
 def similarity_ratio(value_a, value_b):
+    # Compare similarity between two strings (password attempts)
     if not value_a and not value_b:
         return 1.0
 
     if not value_a or not value_b:
         return 0.0
-
+ # Levenshtein distance calculation
     rows = len(value_a) + 1
     cols = len(value_b) + 1
     matrix = [[0] * cols for _ in range(rows)]
@@ -116,10 +125,12 @@ def similarity_ratio(value_a, value_b):
 
 
 def get_user(username):
+    #Get user from dictionary
     return USERS.get(username)
 
 
 def resolve_ip(username, provided_ip=None):
+    # Use provided IP or fallback to registered IP
     if provided_ip:
         return provided_ip
 
@@ -131,16 +142,19 @@ def resolve_ip(username, provided_ip=None):
 
 
 def is_locked(username):
+    # Check if user is locked out
     state = load_state()
     return username in state["lockouts"]
 
 
 def record_failed_attempt(username, ip):
+    # Track failed login attempts
     state = load_state()
     failed_attempts = state["failed_attempts"].get(username, [])
     failed_attempts.append({"timestamp": now_iso(), "ip": ip})
     state["failed_attempts"][username] = failed_attempts
 
+    # Lock account if max attempts reached
     if len(failed_attempts) >= MAX_ATTEMPTS:
         state["lockouts"][username] = {
             "locked_at": now_iso(),
@@ -154,10 +168,10 @@ def record_failed_attempt(username, ip):
 
 
 def clear_failed_attempts(username):
+    # Reset failed attempts after successful login
     state = load_state()
     state["failed_attempts"][username] = []
     save_state(state)
-
 
 def build_log_entry(
     username,
@@ -190,20 +204,23 @@ def build_log_entry(
 
 
 def login(username, password, ip=None):
+    # Main login function
     user = get_user(username)
     client_ip = resolve_ip(username, ip)
+# Handle unknown user
 
     if not user:
         entry = build_log_entry(username, client_ip, "unknown_user", password, 0.0, 0, False)
         append_log(entry)
         return False, "User does not exist."
-
+# Check if account is locked
     if is_locked(username):
         entry = build_log_entry(username, client_ip, "locked", password, 0.0, 0, True)
         append_log(entry)
         return False, "Account is locked until an administrator unlocks it."
-
+        
     similarity = similarity_ratio(password, recover_demo_password(user["password_hash"]))
+     # Check password match
     if user["password_hash"] == hash_password(password):
         clear_failed_attempts(username)
         entry = build_log_entry(
@@ -231,14 +248,18 @@ def login(username, password, ip=None):
 
 
 def admin_unlock(username):
+    # Load current login state 
     state = load_state()
-
+# Chekc if user is actually locked
     if username not in state["lockouts"]:
         return False, "User is not locked."
-
+# Remove user from lockout list 
     del state["lockouts"][username]
+    # Reset failed attempts 
     state["failed_attempts"][username] = []
+    # Save updated state 
     save_state(state)
+    #Log admin unlock action
     append_log(
         {
             "timestamp": now_iso(),
@@ -256,6 +277,7 @@ def admin_unlock(username):
 
 
 def recover_demo_password(password_hash):
+    #Match hash to demo password (for similarity comparison)
     for username, data in USERS.items():
         if data["password_hash"] == password_hash:
             demo_passwords = {
@@ -270,15 +292,19 @@ def recover_demo_password(password_hash):
 
 
 def summarize_ip_activity(logs):
+    #Group failed activty by IP address 
     grouped = defaultdict(list)
     for entry in logs:
         if entry["status"] in {"failed", "locked", "unknown_user"}:
             grouped[entry["ip"]].append(entry)
 
     summaries = []
+    # Analyze each IP's behavior 
     for ip, attempts in grouped.items():
         attempts = sorted(attempts, key=lambda item: item["timestamp"])
+        # Convert timestamps to datetime 
         timestamps = [datetime.fromisoformat(item["timestamp"]) for item in attempts]
+        # Calculate time gaps between attempts 
         gaps = []
         for first, second in zip(timestamps, timestamps[1:]):
             gaps.append((second - first).total_seconds())
@@ -296,27 +322,34 @@ def summarize_ip_activity(logs):
                 ),
             }
         )
+        # Sort by most suspicious (highest attempt first) 
     return sorted(summaries, key=lambda item: item["attempt_count"], reverse=True)
 
 
 def calculate_risk(ip_summary):
+    # Start risk score 
     score = 0
+    # more attempts = higher risk 
     score += min(ip_summary["attempt_count"] * 12, 60)
 
+    # Faster attempts = more suspicious (brute force behavior) 
     min_gap = ip_summary["minimum_seconds_between_attempts"]
     if min_gap is not None and min_gap < 10:
         score += 25
     elif min_gap is not None and min_gap < 60:
         score += 10
-
+        
+# Multiple usernmes targeted = possible attack 
     if len(ip_summary["usernames"]) > 1:
         score += 20
 
+    #High password similarity + guessing real password 
     if ip_summary["closest_password_similarity"] >= 80:
         score += 20
     elif ip_summary["closest_password_similarity"] >= 50:
         score += 10
-
+        
+# Assign severity level 
     if score >= 80:
         return score, "CRITICAL"
     if score >= 55:
@@ -327,6 +360,7 @@ def calculate_risk(ip_summary):
 
 
 def generate_admin_message(ip_summary, severity, score):
+     # Create readable alert message for admin 
     usernames = ", ".join(ip_summary["usernames"]) or "unknown users"
     average_gap = ip_summary["average_seconds_between_attempts"]
     gap_text = "single attempt observed" if average_gap is None else f"average gap {average_gap} seconds"
@@ -341,10 +375,11 @@ def generate_admin_message(ip_summary, severity, score):
 
 
 def analyze_logs():
+    # Load logs and analyze suspicious behavior 
     logs = load_logs()
     ip_summaries = summarize_ip_activity(logs)
     alerts = []
-
+ # Generate alerts for each suspicious IP 
     for summary in ip_summaries:
         score, severity = calculate_risk(summary)
         alerts.append(
@@ -360,7 +395,7 @@ def analyze_logs():
                 "admin_message": generate_admin_message(summary, severity, score),
             }
         )
-
+# Summary Statistics 
     totals = {
         "total_events": len(logs),
         "failed_attempts": sum(1 for item in logs if item["status"] == "failed"),
@@ -373,16 +408,18 @@ def analyze_logs():
 
 
 def write_report():
+    # Generate Report
     analysis = analyze_logs()
     with open(REPORT_FILE, "w", encoding="utf-8") as report:
         report.write("Failed Login Monitoring Report\n")
         report.write("================================\n\n")
+        # Write summary stats
         report.write(f"Total Events: {analysis['totals']['total_events']}\n")
         report.write(f"Failed Attempts: {analysis['totals']['failed_attempts']}\n")
         report.write(f"Locked Attempts: {analysis['totals']['locked_attempts']}\n")
         report.write(f"Successful Logins: {analysis['totals']['successful_logins']}\n")
         report.write(f"Unknown User Attempts: {analysis['totals']['unknown_user_attempts']}\n\n")
-
+      # Write suspicious activity section
         if not analysis["alerts"]:
             report.write("No suspicious failed-login patterns have been logged yet.\n")
         else:
@@ -402,7 +439,7 @@ def write_report():
                     f"{alert['closest_password_similarity']}%\n"
                 )
                 report.write(f"Admin Message: {alert['admin_message']}\n\n")
-
+        # Write raw logs 
         report.write("Detailed Log Entries\n")
         report.write("--------------------\n")
         for entry in analysis["logs"]:
