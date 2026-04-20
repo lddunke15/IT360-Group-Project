@@ -1,7 +1,8 @@
 import sqlite3
 import os
 
-DB_NAME = "login.db"
+# Configuration 
+DB_NAME = "login.db"  
 REPORT_FILE = "Logs.txt"
 
 def load_data():
@@ -10,6 +11,7 @@ def load_data():
 		return 0, 0, []
 
 	try:
+		# Ensure databsse exists before attempting connection
     		conn = sqlite3.connect(DB_NAME)
     		c = conn.cursor()
 
@@ -22,6 +24,7 @@ def load_data():
     		return clicks, submissions, rows
 
 	except Exception as e:
+		# Basic error handling for database failures
     		print("Database Error:", e)
     		return 0, 0, []
 
